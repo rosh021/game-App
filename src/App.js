@@ -1,20 +1,90 @@
+import { useEffect } from "react";
 import { useState } from "react";
 import "./App.css";
+import { Patterns } from "./components/array";
 import { Square } from "./components/Square";
 
 function App() {
   const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
   const [player, setPlayer] = useState("😀");
+  const [result, setResult] = useState({ winner: "none", state: "none" });
+  const [win, setWin] = useState(false);
+
+  const click = new Audio("./click.mp3");
+  const gameWinnerSound = new Audio("./win.wav");
+  const restartSound = new Audio("./restart.wav");
+
+  const clickPlay = () => {
+    click.play();
+  };
+  const gameWinner = () => {
+    gameWinnerSound.play();
+  };
+  const gameRestart = () => {
+    restartSound.play();
+  };
+
+  useEffect(() => {
+    winnerCheck();
+    tiePlayer();
+    if (player === "😎") {
+      setPlayer("😀");
+    } else {
+      setPlayer("😎");
+    }
+  }, [board]);
+
+  useEffect(() => {
+    if (result.state != "none") {
+      setWin(true);
+      alert(`Game Over !! Winner Player is: ${result.winner}`);
+    }
+  }, [result]);
   const handelOnClick = (square) => {
     setBoard(
       board.map((val, i) => {
-        if (i == square && val == "") {
+        if (i === square && val === "") {
           return player;
         }
 
         return val;
       })
     );
+  };
+
+  const winnerCheck = () => {
+    Patterns.forEach((current) => {
+      const firstPlayer = board[current[0]];
+      if (firstPlayer === "") return;
+      let foundWinner = true;
+      current.forEach((index) => {
+        if (board[index] !== firstPlayer) {
+          foundWinner = false;
+        }
+      });
+
+      if (foundWinner) {
+        setResult({ winner: player, state: "Won" });
+      }
+    });
+  };
+
+  const restartGame = () => {
+    setBoard(["", "", "", "", "", "", "", "", ""]);
+    setPlayer("😀");
+    setWin(false);
+  };
+
+  const tiePlayer = () => {
+    let filled = true;
+    board.forEach((square) => {
+      if (square === "") {
+        filled = false;
+      }
+    });
+    if (filled) {
+      setResult({ winner: "No one", state: "Tie" });
+    }
   };
   return (
     <div className="App">
@@ -37,6 +107,7 @@ function App() {
           <Square chooseSquare={() => handelOnClick(8)} val={board[8]} />
         </div>
       </div>
+      {win ? <button onClick={restartGame}>Restart Game</button> : null}
     </div>
   );
 }
