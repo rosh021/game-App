@@ -37,10 +37,12 @@ function App() {
   useEffect(() => {
     if (result.state != "none") {
       setWin(true);
+      gameWinner();
       alert(`Game Over !! Winner Player is: ${result.winner}`);
     }
   }, [result]);
   const handelOnClick = (square) => {
+    clickPlay();
     setBoard(
       board.map((val, i) => {
         if (i === square && val === "") {
@@ -71,6 +73,7 @@ function App() {
 
   const restartGame = () => {
     setBoard(["", "", "", "", "", "", "", "", ""]);
+    gameRestart();
     setPlayer("😀");
     setWin(false);
   };
